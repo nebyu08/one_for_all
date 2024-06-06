@@ -18,7 +18,26 @@ class Categorical_loss_entropy(Loss):
         elif len(y_true.shape)==1:
             correctness=y_pred_cliped[range(len(y_pred_cliped)),y_true]
         else:
-            raise Except("there is an error with the shape of the input.")
+            raise Exception("there is an error with the shape of the input.")
             
         self.loss=-np.log(correctness)
         return self.loss
+    
+    def backward(self,dvalues,y_true):
+        self.dvalues=dvalues
+        self.y_true=y_true
+        samples=len(self.dvalues)
+        
+        #how much element in the one hot encoded
+        labels=len(self.dvalues[0])
+
+        #checking if the y true is one hot encoded
+        self.y_true=np.eye(labels)[y_true]
+
+        self.dinputs=-self.y_true/self.dvalues
+
+        #lets normalize the gradients
+        self.dinputs=self.dinputs/samples
+        
+        return self.dinputs
+    
