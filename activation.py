@@ -2,7 +2,14 @@ import numpy as np
 
 class Relu:
     def forward(self,inputs):
+        self.inputs=inputs
         self.output=np.maximum(0,inputs)
+    
+    def backward(self,dvalues):
+        drelu=np.dvalues.copy()
+        drelu[self.output<=0]=0
+        return drelu
+
     
 
 class Softmax:
