@@ -26,5 +26,7 @@ class Softmax:
         for index,(single_outputs,single_dvalues) in enumerate(zip(self.outputs,dvalues)):
             single_outputs=single_outputs.reshape(-1,1)  #change it into column vector
             jackobian_matrix=np.diagflat(single_outputs) - np.dot(single_outputs,single_outputs.T)
-            self.dinputs[index]=np.dot(single_outputs,jackobian_matrix)
-        
+           # print(f"here we are:{single_outputs.shape} and {jackobian_matrix.shape}")
+            self.dinputs[index]=np.dot(jackobian_matrix,single_dvalues)
+
+
