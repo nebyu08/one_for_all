@@ -47,7 +47,7 @@ class softmax_categorical_loss:
         and used for both the forward and backward propagation.
     """
 
-    def __init__(self,inputs):
+    def __init__(self):
         self.activation=Softmax()
         self.loss=Categorical_loss_entropy()
     
