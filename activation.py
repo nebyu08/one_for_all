@@ -6,8 +6,9 @@ class Relu:
         self.output=np.maximum(0,inputs)
     
     def backward(self,dvalues):
-        drelu=np.dvalues.copy()
+        drelu=dvalues.copy()
         drelu[self.output<=0]=0
+        self.drelu=drelu
         return drelu
 
     
@@ -28,5 +29,3 @@ class Softmax:
             jackobian_matrix=np.diagflat(single_outputs) - np.dot(single_outputs,single_outputs.T)
            # print(f"here we are:{single_outputs.shape} and {jackobian_matrix.shape}")
             self.dinputs[index]=np.dot(jackobian_matrix,single_dvalues)
-
-
