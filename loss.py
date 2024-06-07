@@ -1,4 +1,5 @@
 import numpy as np
+from activation import Softmax
 
 class Loss:
     def calculate(self,y_pred,y_true):
@@ -40,4 +41,29 @@ class Categorical_loss_entropy(Loss):
         self.dinputs=self.dinputs/samples
         
         return self.dinputs
+
+class softmax_categorical_loss:
+    """ this class has softmax and loss calculation all in one.
+        and used for both the forward and backward propagation.
+    """
+
+    def __init__(self,inputs):
+        self.activation=Softmax()
+        self.loss=Categorical_loss_entropy()
     
+    def forward(self,inputs,y_true):
+        self.activation.forward(inputs)
+        self.loss=self.loss.calculate(self.activation.outputs,y_true)
+    
+    def backward(self,dvalues,y_true):
+        self.dinputs=dvalues.copy()   #since the dinputs is y_pred-y_act
+        samples=len(y_true)
+
+        #check if its 2d matrix
+        if len(y_true.shape)==2:
+            y_true=np.argmax(y_true,axis=1)
+        
+        self.dinputs[range(samples),y_true]-=1
+
+        #lets normalze the results
+        self.dinputs=self.dinputs/samples
