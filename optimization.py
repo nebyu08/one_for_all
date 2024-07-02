@@ -11,7 +11,7 @@ class SGD:
     #this is for the learning rate
     def pre_update_params(self):
         if self.decay_rate:
-            self.current_learning_rate=self.learning_rate/(1+self.decay_rate*self.iterations)
+            self.current_learning_rate=self.learning_rate * 1/(1+self.decay_rate*self.iterations)
     
     #this is for the weght update with momentum
     def update_params(self,layer):
