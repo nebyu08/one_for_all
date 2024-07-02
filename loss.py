@@ -53,7 +53,8 @@ class softmax_categorical_loss:
     
     def forward(self,inputs,y_true):
         self.activation.forward(inputs)
-        self.loss=self.loss.calculate(self.activation.outputs,y_true)
+        self.outputs=self.activation.outputs
+        return self.loss.calculate(self.outputs,y_true)
     
     def backward(self,dvalues,y_true):
         self.dinputs=dvalues.copy()   #since the dinputs is y_pred-y_act
