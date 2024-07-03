@@ -103,7 +103,6 @@ class Adam:
         implimenting Adam Optimizer from scratch. 
     
     """
-
     def __init__(self,lr=0.001,decay_rate=0,beta_1=0.9,beta_2= 0.999,epsilon=1e-4) -> None:
         self.learning_rate=lr
         self.current_learning_rate=lr
@@ -128,7 +127,7 @@ class Adam:
         
         #lets configure the momentum
         layer.weight_momentum=self.beta_1*layer.weight_momentum + (1-self.beta_1)*layer.dweights 
-        layer.bias_momenum=self.beta_1*layer.bias_momentum + (1-self.beta_1)*layer.dbias
+        layer.bias_momentum=self.beta_1*layer.bias_momentum + (1-self.beta_1)*layer.dbias
 
         #lets get the corrected momentum 
         weight_momentum_corrected=layer.weight_momentum/(1-self.beta_1**(self.iteration+1))
@@ -137,7 +136,7 @@ class Adam:
 
         #lets configure the cached values 
         layer.weight_cached=self.beta_2*layer.weight_cached + (1-self.beta_2)*(layer.dweights**2)
-        layer.bias_cached=self.beta_2*layer.weight_cached + (1-self.beta_2)*(layer.dbias**2)
+        layer.bias_cached=self.beta_2*layer.bias_cached + (1-self.beta_2)*(layer.dbias**2)
 
         #lets get its corrected form 
         weight_cached_corrected=layer.weight_cached/(1-self.beta_2**(self.iteration+1))
