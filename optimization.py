@@ -22,12 +22,8 @@ class SGD:
             self.bias_momentums=np.zeros_like(layer.bias)
 
             #we are calculating the amount to which we should change our current gradient
-            self.weight_update=self.momentum*self.weight_momentums - self.learning_rate*layer.dweights
-            self.bias_update=self.momentum*self.bias_momentums - self.learning_rate*layer.dbias
-
-            #lets assign the current calculated weight and bias as the next caculation intial accumulated gradient
-            self.weight_momentums=self.weight_update
-            self.bias_momentums=self.bias_update
+            self.weight_update=self.momentum*self.weight_momentums - self.learning_rate*layer.dweights   #this is the accumulated value of weight 
+            self.bias_update=self.momentum*self.bias_momentums - self.learning_rate*layer.dbias           #this is the accumulated value of bias
         
         else:
             self.weight_update=-self.current_learning_rate*layer.dweights
@@ -91,8 +87,8 @@ class RMS_Prop:
             layer.cache_bias=np.zeros_like(layer.bias)
         
         #calculating the cahe of the gradient
-        layer.cache_weight=self.rho*layer.cache_weight+ (1-self.rho) *layer.dweights**2
-        layer.cache_bias=self.rho*layer.cache_bias+ (1-self.rho) *layer.dbias**2
+        layer.cache_weight=self.rho*layer.cache_weight+ (1-self.rho) *(layer.dweights **2)
+        layer.cache_bias=self.rho*layer.cache_bias+ (1-self.rho) *(layer.dbias **2)
 
         #lets update the parameters of the model
         layer.weights+=-self.current_learning_rate*layer.dweights/(np.sqrt(layer.cache_weight)+self.epsilon)
@@ -102,4 +98,54 @@ class RMS_Prop:
         self.iteration+=1
 
 
+class Adam:
+    """
+        implimenting Adam Optimizer from scratch. 
+    
+    """
+
+    def __init__(self,lr=0.001,decay_rate=0,beta_1=0.9,beta_2= 0.999,epsilon=1e-4) -> None:
+        self.learning_rate=lr
+        self.current_learning_rate=lr
+        self.beta_1=beta_1
+        self.beta_2=beta_2
+        self.epsilon=epsilon
+        self.decay_rate=decay_rate
+        self.iteration=0
+    
+    def pre_update_params(self)->None:
+        if self.decay_rate:
+            self.current_learning_rate=self.learning_rate/(1+self.decay_rate*self.iteration)
+    
+    def update_params(self,layer)->None:
+        if not hasattr(layer,"weight_momentum"):
+            layer.weight_momentum=np.zeros_like(layer.weights)
+            layer.weight_cached=np.zeros_like(layer.weights)
+
+            layer.bias_momentum=np.zeros_like(layer.bias)
+            layer.bias_cached=np.zeros_like(layer.bias) 
+
         
+        #lets configure the momentum
+        layer.weight_momentum=self.beta_1*layer.weight_momentum + (1-self.beta_1)*layer.dweights 
+        layer.bias_momenum=self.beta_1*layer.bias_momentum + (1-self.beta_1)*layer.dbias
+
+        #lets get the corrected momentum 
+        weight_momentum_corrected=layer.weight_momentum/(1-self.beta_1**(self.iteration+1))
+        bias_momentum_corrected=layer.bias_momentum/(1-self.beta_1**(self.iteration+1))
+
+
+        #lets configure the cached values 
+        layer.weight_cached=self.beta_2*layer.weight_cached + (1-self.beta_2)*(layer.dweights**2)
+        layer.bias_cached=self.beta_2*layer.weight_cached + (1-self.beta_2)*(layer.dbias**2)
+
+        #lets get its corrected form 
+        weight_cached_corrected=layer.weight_cached/(1-self.beta_2**(self.iteration+1))
+        bias_cached_corrected=layer.bias_cached/(1-self.beta_2**(self.iteration+1))
+
+        #lets update the parameters of the model
+        layer.weights+=-self.current_learning_rate*weight_momentum_corrected/(np.sqrt(weight_cached_corrected)+self.epsilon)
+        layer.bias+=-self.current_learning_rate*bias_momentum_corrected/(np.sqrt(bias_cached_corrected)+self.epsilon)
+
+    def post_update_params(self):
+        self.iteration+=1
